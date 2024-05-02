@@ -1,3 +1,21 @@
+<?php
+include "mysql.php";
+
+// SQL query to select blog posts
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $conn = mysql_connect();
+    $title = $_POST['title'];
+    $content = $_POST['content'];
+    
+    // Prepare and bind
+    $stmt = $conn->prepare("INSERT INTO blog (title, content) VALUES (?, ?)");
+    $stmt->bind_param("ss", $title, $content);
+    $stmt->execute();
+
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,7 +29,24 @@
 
 <body>
 <?php include "blog-nav.php" ?>
-
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-4">
+                <h2>Tambah Post Baru</h2>
+                <form id="addPostForm" action="blog-add.php" method="post">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
