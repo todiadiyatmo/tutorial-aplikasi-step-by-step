@@ -10,11 +10,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $content = $_POST['content'] ?? '';
 
     // Update the database
-    $stmt = $conn->prepare("UPDATE blog SET title = ?, content = ? WHERE id = ?");
-    $stmt->bind_param("ssi", $title, $content, $id);
-    $stmt->execute();
-    $stmt->close();
-
+    if ($id > 0 && !empty($title) && !empty($content)) {
+        $stmt = $conn->prepare("UPDATE blog SET title = ?, content = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $title, $content, $id);
+        if ($stmt->execute()) {
+            $message = "Post updated successfully. <a href='blog-list.php'>View Posts</a>";
+        } else {
+            $message = "Error updating post: " . $stmt->error;
+        }
+        $stmt->close();
+    } else {
+        $message = "All fields are required.";
+    }
 } 
 if (isset($_REQUEST['id'])) {
 
@@ -58,6 +65,13 @@ if (isset($_REQUEST['id'])) {
         <div class="row">
             <div class="col-4">
                 <h2>Edit Post</h2>
+
+                <?php if (isset($message)) { ?>
+                    <div class="alert alert-info" role="alert">
+                        <?php echo $message ?>
+                    </div>
+                <?php } ?>
+
                 <form action="blog-edit.php" method="post">
                     <input type="hidden" name="id" value="<?php echo $id; ?>">
                     <div class="mb-3">
