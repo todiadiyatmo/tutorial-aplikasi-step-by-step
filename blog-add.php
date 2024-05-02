@@ -10,8 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Prepare and bind
     $stmt = $conn->prepare("INSERT INTO blog (title, content) VALUES (?, ?)");
     $stmt->bind_param("ss", $title, $content);
-    $stmt->execute();
-
+    
+    // Execute and check
+    if ($stmt->execute()) {
+        $message = "Post baru berhasil dibuat";
+    } else {
+        $message = $stmt->error;
+    }
 }
 
 ?>
@@ -33,6 +38,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="row">
             <div class="col-4">
                 <h2>Tambah Post Baru</h2>
+
+                <?php if( isset($message) ) { ?>
+                    <div class="alert alert-info" role="alert">
+                        <?php echo $message ?>
+                    </div>
+                <?php }?>
+
                 <form id="addPostForm" action="blog-add.php" method="post">
                     <div class="mb-3">
                         <label for="title" class="form-label">Title</label>
